@@ -22,8 +22,8 @@ const Login = () => {
     try {
       const url =
         currentState === "Login"
-          ? "http://localhost:8081/api/auth/login"
-          : "http://localhost:8081/api/auth/register";
+          ? "http://ec2-54-92-219-181.compute-1.amazonaws.com:8081/api/auth/login"
+          : "http://ec2-54-92-219-181.compute-1.amazonaws.com:8081/api/auth/register";
 
       const bodyData =
         currentState === "Login"
