@@ -1,12 +1,6 @@
-// src/pages/Login.jsx
-import React, { useState, useContext } from "react";
-import { FoodContext } from "../context/FoodContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 
 const Login = () => {
-  const { saveToken } = useContext(FoodContext);
-  const navigate = useNavigate();
-
   const [currentState, setCurrentState] = useState("Login");
   const [formData, setFormData] = useState({
     name: "",
@@ -22,18 +16,45 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (currentState === "Login") {
-      // ✅ Login flow
-      saveToken("dummy_token");
-      alert("Login successful!");
-      navigate("/profile");
-    } else {
-      // ✅ Register flow (no token, no redirect)
-      alert("Register successful!");
-      // stays in Register mode, user can manually switch to Login if needed
+    try {
+      const url =
+        currentState === "Login"
+          ? "http://localhost:8081/api/auth/login"
+          : "http://localhost:8081/api/auth/register";
+
+      const bodyData =
+        currentState === "Login"
+          ? { email: formData.email, password: formData.password }
+          : {
+              name: formData.name,
+              email: formData.email,
+              phoneNumber: formData.phoneNumber,
+              password: formData.password,
+            };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData),
+      });
+
+      const data = await res.json();
+      console.log("API Response:", data);
+
+      if (data.token) {
+        localStorage.setItem("token", data.token); // ✅ save token for profile page
+        alert(
+          (currentState === "Login" ? "Login" : "Register") + " successful!"
+        );
+      } else {
+        alert(data.message || "Something went wrong!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
     }
   };
 
@@ -48,6 +69,7 @@ const Login = () => {
           <hr className="border-none h-[1.5px] w-20 bg-gray-800 mt-2 mb-4" />
         </div>
 
+        {/* Name input (Register only) */}
         {currentState === "Register" && (
           <input
             type="text"
@@ -60,6 +82,7 @@ const Login = () => {
           />
         )}
 
+        {/* Email */}
         <input
           type="email"
           name="email"
@@ -70,6 +93,7 @@ const Login = () => {
           required
         />
 
+        {/* Phone Number (Register only) */}
         {currentState === "Register" && (
           <input
             type="text"
@@ -82,6 +106,7 @@ const Login = () => {
           />
         )}
 
+        {/* Password */}
         <input
           type="password"
           name="password"
@@ -99,6 +124,7 @@ const Login = () => {
           {currentState === "Login" ? "Login" : "Register"}
         </button>
 
+        {/* ✅ Toggle Login/Register */}
         <p className="mt-4 text-sm text-center">
           {currentState === "Login" ? (
             <>
