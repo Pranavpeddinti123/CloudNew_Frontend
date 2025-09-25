@@ -1,8 +1,12 @@
-import React, { useState } from "react";
-
-const API_URL = "http://ec2-34-228-81-125.compute-1.amazonaws.com:8081/api/auth"; // ✅ Base URL constant
+// src/pages/Login.jsx
+import React, { useState, useContext } from "react";
+import { FoodContext } from "../context/FoodContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const { saveToken } = useContext(FoodContext);
+  const navigate = useNavigate();
+
   const [currentState, setCurrentState] = useState("Login");
   const [formData, setFormData] = useState({
     name: "",
@@ -18,45 +22,18 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      const url =
-        currentState === "Login"
-          ? `${API_URL}/login`
-          : `${API_URL}/register`; // ✅ Use constant
-
-      const bodyData =
-        currentState === "Login"
-          ? { email: formData.email, password: formData.password }
-          : {
-              name: formData.name,
-              email: formData.email,
-              phoneNumber: formData.phoneNumber,
-              password: formData.password,
-            };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bodyData),
-      });
-
-      const data = await res.json();
-      console.log("API Response:", data);
-
-      if (data.token) {
-        localStorage.setItem("token", data.token); // ✅ Save token
-        alert(
-          (currentState === "Login" ? "Login" : "Register") + " successful!"
-        );
-      } else {
-        alert(data.message || "Something went wrong!");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
+    if (currentState === "Login") {
+      // ✅ Login flow
+      saveToken("dummy_token");
+      alert("Login successful!");
+      navigate("/profile");
+    } else {
+      // ✅ Register flow (no token, no redirect)
+      alert("Register successful!");
+      // stays in Register mode, user can manually switch to Login if needed
     }
   };
 
@@ -71,7 +48,6 @@ const Login = () => {
           <hr className="border-none h-[1.5px] w-20 bg-gray-800 mt-2 mb-4" />
         </div>
 
-        {/* Name input (Register only) */}
         {currentState === "Register" && (
           <input
             type="text"
@@ -84,7 +60,6 @@ const Login = () => {
           />
         )}
 
-        {/* Email */}
         <input
           type="email"
           name="email"
@@ -95,7 +70,6 @@ const Login = () => {
           required
         />
 
-        {/* Phone Number (Register only) */}
         {currentState === "Register" && (
           <input
             type="text"
@@ -108,11 +82,51 @@ const Login = () => {
           />
         )}
 
-        {/* Password */}
         <input
           type="password"
           name="password"
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="w-full mb-3 p-2 bord
+          className="w-full mb-3 p-2 border rounded-md"
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 transition"
+        >
+          {currentState === "Login" ? "Login" : "Register"}
+        </button>
+
+        <p className="mt-4 text-sm text-center">
+          {currentState === "Login" ? (
+            <>
+              Don’t have an account?{" "}
+              <button
+                type="button"
+                className="text-blue-500 underline"
+                onClick={() => setCurrentState("Register")}
+              >
+                Register
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button
+                type="button"
+                className="text-blue-500 underline"
+                onClick={() => setCurrentState("Login")}
+              >
+                Login
+              </button>
+            </>
+          )}
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
