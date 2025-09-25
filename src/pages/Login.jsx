@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+const API_URL = "http://localhost:8081/api/auth"; // ✅ Base URL constant
+
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
   const [formData, setFormData] = useState({
@@ -22,8 +24,8 @@ const Login = () => {
     try {
       const url =
         currentState === "Login"
-          ? "http://localhost:8081/api/auth/login"
-          : "http://localhost:8081/api/auth/register";
+          ? `${API_URL}/login`
+          : `${API_URL}/register`; // ✅ Use constant
 
       const bodyData =
         currentState === "Login"
@@ -45,7 +47,7 @@ const Login = () => {
       console.log("API Response:", data);
 
       if (data.token) {
-        localStorage.setItem("token", data.token); // ✅ save token for profile page
+        localStorage.setItem("token", data.token); // ✅ Save token
         alert(
           (currentState === "Login" ? "Login" : "Register") + " successful!"
         );
@@ -113,46 +115,4 @@ const Login = () => {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded-md"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 transition"
-        >
-          {currentState === "Login" ? "Login" : "Register"}
-        </button>
-
-        {/* ✅ Toggle Login/Register */}
-        <p className="mt-4 text-sm text-center">
-          {currentState === "Login" ? (
-            <>
-              Don’t have an account?{" "}
-              <button
-                type="button"
-                className="text-blue-500 underline"
-                onClick={() => setCurrentState("Register")}
-              >
-                Register
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                type="button"
-                className="text-blue-500 underline"
-                onClick={() => setCurrentState("Login")}
-              >
-                Login
-              </button>
-            </>
-          )}
-        </p>
-      </form>
-    </div>
-  );
-};
-
-export default Login;
+          className="w-full mb-3 p-2 bord
