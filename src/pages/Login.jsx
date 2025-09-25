@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_URL = "http://localhost:8081/api/auth"; // ✅ Base URL constant
+const API_URL = "http://ec2-34-228-81-125.compute-1.amazonaws.com:8081/api/auth"; // ✅ Base URL constant
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
